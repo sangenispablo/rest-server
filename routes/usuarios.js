@@ -2,6 +2,11 @@ const { Router } = require("express");
 const { check } = require("express-validator");
 
 const { validarCampos } = require("../middlewares/validar-campos");
+const {
+  esRoleValido,
+  emailExiste,
+  existeUsuarioPorId,
+} = require("../helpers/db-validators");
 
 const router = Router();
 
@@ -15,7 +20,12 @@ const {
 
 router.get("/", usuariosGet);
 
-router.put("/:id", usuariosPut);
+router.put(
+  "/:id",
+  check("id").custom(existeUsuarioPorId),
+  validarCampos,
+  usuariosPut
+);
 
 router.post(
   "/",
@@ -26,7 +36,11 @@ router.post(
       "El password tiene que tener al menos 6 caracteres"
     ).isLength({ min: 6 }),
     check("correo", "La dirección de correo no es valida").isEmail(),
-    check("rol", "No es un Rol valido").isIn(["ADMIN_ROLE", "USER_ROLE"]),
+    // chequeo si el mail existe
+    check("correo").custom(emailExiste),
+    // check("rol", "No es un Rol valido").isIn(["ADMIN_ROLE", "USER_ROLE"]),
+    // como chequear un campo con otra colecion o tabla
+    check("rol").custom(esRoleValido),
     validarCampos,
   ],
   usuariosPost

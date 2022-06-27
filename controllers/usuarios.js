@@ -2,42 +2,56 @@ const { request, response } = require("express");
 const bcryptjs = require("bcryptjs");
 
 const Usuario = require("../models/usuario");
+const usuario = require("../models/usuario");
 
-const usuariosGet = (req = request, res = response) => {
-  const { name, edad, page = "1" } = req.query;
+const usuariosGet = async (req = request, res = response) => {
+  const { limite = 5, desde = 0 } = req.query;
+
+  const [ total, usuarios ] = await Promise.all([
+    Usuario.countDocuments({ estado: true }),
+    Usuario.find({ estado: true }).skip(Number(desde)).limit(Number(limite)),
+  ]);
+
+  const pagina = usuarios.length;
+
   res.json({
-    msg: "get API",
-    name,
-    edad,
-    page,
+    msg: "ok",
+    total,
+    pagina,
+    usuarios,
   });
 };
 
-const usuariosPut = (req = request, res = response) => {
+const usuariosPut = async (req = request, res = response) => {
   const { id } = req.params;
+  const { _id, password, google, correo, ...resto } = req.body;
+
+  if (password) {
+    // encriptar password
+    const salt = bcryptjs.genSaltSync();
+    resto.password = bcryptjs.hashSync(password, salt);
+  }
+
+  const usuario = await Usuario.findByIdAndUpdate(id, resto, { new: true });
+
   res.json({
-    msg: "put API",
-    id,
+    msg: "ok",
+    usuario,
   });
 };
 
 const usuariosPost = async (req = request, res = response) => {
   const { nombre, correo, password, rol } = req.body;
   const usuario = new Usuario({ nombre, correo, password, rol });
-  // validar email
-  const existeCorreo = await Usuario.findOne({ correo });
-  if (existeCorreo) {
-    return res.status(400).json({
-      msg: "El correo ya está registrado",
-    });
-  }
+
   // encriptar password
   const salt = bcryptjs.genSaltSync();
   usuario.password = bcryptjs.hashSync(password, salt);
 
+  // grabo en la BD
   await usuario.save();
   res.json({
-    msg: "post API",
+    msg: "ok",
     usuario,
   });
 };

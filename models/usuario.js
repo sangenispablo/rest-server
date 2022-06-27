@@ -31,7 +31,6 @@ const UsuarioSchema = Schema({
   rol: {
     type: String,
     required: true,
-    enum: ["ADMIN_ROLE", "USER_ROLE"],
   },
   estado: {
     type: Boolean,
@@ -42,5 +41,12 @@ const UsuarioSchema = Schema({
     default: false,
   },
 });
+
+// aca puedo crear metodos personalizados, en este caso estoy sobreescribiendo el metodo
+// toJSON para que solo devuelva parte del schema y no todo
+UsuarioSchema.methods.toJSON = function () {
+  const { password, __v, ...usuario } = this.toObject();
+  return usuario;
+};
 
 module.exports = model("Usuario", UsuarioSchema);
