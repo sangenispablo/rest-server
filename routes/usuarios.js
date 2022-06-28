@@ -22,8 +22,11 @@ router.get("/", usuariosGet);
 
 router.put(
   "/:id",
-  check("id").custom(existeUsuarioPorId),
-  validarCampos,
+  [
+    check("id").custom(existeUsuarioPorId),
+    check("rol").custom(esRoleValido),
+    validarCampos,
+  ],
   usuariosPut
 );
 
@@ -46,6 +49,13 @@ router.post(
   usuariosPost
 );
 
-router.delete("/", usuariosDelete);
+router.delete(
+  "/:id",
+  [
+    check("id").custom(existeUsuarioPorId), 
+    validarCampos
+  ],
+  usuariosDelete
+);
 
 module.exports = router;
