@@ -45,7 +45,8 @@ const UsuarioSchema = Schema({
 // aca puedo crear metodos personalizados, en este caso estoy sobreescribiendo el metodo
 // toJSON para que solo devuelva parte del schema y no todo
 UsuarioSchema.methods.toJSON = function () {
-  const { password, __v, ...usuario } = this.toObject();
+  const { password, __v, _id, ...usuario } = this.toObject();
+  usuario.uid = _id;
   return usuario;
 };
 

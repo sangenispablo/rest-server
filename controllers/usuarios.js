@@ -1,4 +1,5 @@
 const { request, response } = require("express");
+const jwt = require("jsonwebtoken");
 const bcryptjs = require("bcryptjs");
 
 const Usuario = require("../models/usuario");
@@ -55,17 +56,18 @@ const usuariosPost = async (req = request, res = response) => {
   });
 };
 
-const usuariosDelete = (req = request, res = response) => {
+const usuariosDelete = async (req = request, res = response) => {
   const { id } = req.params;
-  // Ojo el el Delete no funciona como antes
+  // Ojo el Delete no funciona como antes
   // esto no deberia usarse
   // const usuario = Usuario.findByIdAndDelete(id);
-  const usuario = Usuario.findByIdAndUpdate(id, { estado: false });
   // Esto es lo mejor marcar con un estado en false para hacer un borrado logico no fisico
-  res.json({
-    msg: "ok",
-    // usuario,
-  });
+  const usuario = await Usuario.findByIdAndUpdate(
+    id,
+    { estado: false },
+    { new: true }
+  );
+  res.json(usuario);
 };
 
 module.exports = {

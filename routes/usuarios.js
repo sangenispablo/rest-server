@@ -1,7 +1,12 @@
 const { Router } = require("express");
 const { check } = require("express-validator");
 
-const { validarCampos } = require("../middlewares/validar-campos");
+const {
+  validarCampos,
+  validarJWT,
+  isAdminRole,
+} = require("../middlewares");
+
 const {
   esRoleValido,
   emailExiste,
@@ -52,8 +57,13 @@ router.post(
 router.delete(
   "/:id",
   [
-    check("id").custom(existeUsuarioPorId), 
-    validarCampos
+    validarJWT,
+    isAdminRole,
+    // a diferencias de los middlewares que venia creando este lo llamo
+    // en este momento, pero el truco esta en validar-roles, miralo !!
+    // asRole('ADMIN_ROLE', 'VENTAS_ROLE'),
+    check("id").custom(existeUsuarioPorId),
+    validarCampos,
   ],
   usuariosDelete
 );
