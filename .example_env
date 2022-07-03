@@ -1,0 +1,4 @@
+PORT=8080
+MONGODB_CNN=mongodb://localhost:27017/cafeDB
+MONGODB_CNN_REMOTE=mongodb+srv://pablo_admin:xy34TxCdRUWe3vP@miclusterpas.rqsvs.mongodb.net/cafeDB
+SECRETORPUBLICKEY=E$t0e$publ1c0@123
